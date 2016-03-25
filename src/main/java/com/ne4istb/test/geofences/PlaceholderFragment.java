@@ -32,6 +32,12 @@ public class PlaceholderFragment extends Fragment {
         mLongitudeView = (EditText) rootView.findViewById(R.id.edit_longitude);
         mRadiusView = (EditText) rootView.findViewById(R.id.edit_radius);
 
+        if (BuildConfig.DEBUG) {
+            mLatitudeView.setText("48.015");
+            mLongitudeView.setText("37.80");
+            mRadiusView.setText("150");
+        }
+
         Button button = (Button) rootView.findViewById(R.id.set_geofence);
         InitButtonCallbacks(button);
 
