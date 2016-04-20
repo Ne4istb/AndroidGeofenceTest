@@ -32,16 +32,11 @@ public class ReceiveTransitionsIntentService extends IntentService {
 		int transitionType = geofencingEvent.getGeofenceTransition();
 
 		List<Geofence> triggeredGeofences = geofencingEvent.getTriggeringGeofences();
-		List<String> triggeredIds = new ArrayList<>();
 
 		for (Geofence geofence : triggeredGeofences) {
 			Log.d("GEO", "onHandle:" + geofence.getRequestId());
 			processGeofence(geofence, transitionType);
-			triggeredIds.add(geofence.getRequestId());
 		}
-
-		if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)
-			removeGeofences(triggeredIds);
 	}
 
 	private void processGeofence(Geofence geofence, int transitionType) {
@@ -51,10 +46,11 @@ public class ReceiveTransitionsIntentService extends IntentService {
 		PendingIntent openActivityIntetnt = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 		int id = Integer.parseInt(geofence.getRequestId());
 
+		String transitionTypeString = getTransitionTypeString(transitionType);
 		notificationBuilder
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Geofence id: " + id)
-				.setContentText("Transition type: " + getTransitionTypeString(transitionType))
+				.setContentText("Transition type: " + transitionTypeString)
 				.setVibrate(new long[]{500, 500})
 				.setContentIntent(openActivityIntetnt)
 				.setAutoCancel(true);
@@ -62,7 +58,7 @@ public class ReceiveTransitionsIntentService extends IntentService {
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.notify(transitionType * 100 + id, notificationBuilder.build());
 
-		Log.d("GEO", "notification built:" + id);
+		Log.d("GEO", String.format("notification built:%d %s", id, transitionTypeString));
 	}
 
 	private String getTransitionTypeString(int transitionType) {

@@ -21,8 +21,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeofencingService extends Service implements
-		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class GeofencingService extends Service implements GoogleApiClient.ConnectionCallbacks,
+		GoogleApiClient.OnConnectionFailedListener {
 
 	public static final String EXTRA_REQUEST_IDS = "requestId";
 	public static final String EXTRA_GEOFENCE = "geofence";
@@ -31,9 +31,7 @@ public class GeofencingService extends Service implements
 	private List<Geofence> mGeofenceListsToAdd = new ArrayList<>();
 	private GoogleApiClient mGoogleApiClient;
 	private Action mAction;
-
-	public enum Action implements Serializable {ADD, REMOVE}
-
+	private int transitionType;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -45,19 +43,18 @@ public class GeofencingService extends Service implements
 		switch (mAction) {
 			case ADD:
 				MyGeofence newGeofence = (MyGeofence) intent.getSerializableExtra(EXTRA_GEOFENCE);
+				transitionType = newGeofence.getTransitionType();
 				mGeofenceListsToAdd.add(newGeofence.toGeofence());
 				break;
 			case REMOVE:
-//                mGeofenceListsToRemove = Arrays.asList(intent.getStringArrayExtra(EXTRA_REQUEST_IDS));
+				//                mGeofenceListsToRemove = Arrays.asList(intent
+				// .getStringArrayExtra(EXTRA_REQUEST_IDS));
 				break;
 		}
 
 
-		mGoogleApiClient = new GoogleApiClient.Builder(this)
-				.addApi(LocationServices.API)
-				.addConnectionCallbacks(this)
-				.addOnConnectionFailedListener(this)
-				.build();
+		mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
+				.addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 		mGoogleApiClient.connect();
 
 		return super.onStartCommand(intent, flags, startId);
@@ -70,9 +67,13 @@ public class GeofencingService extends Service implements
 			case ADD:
 				GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
 				Log.d("GEO", "Location client adds geofence");
-				builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+				builder.setInitialTrigger(
+						transitionType == Geofence.GEOFENCE_TRANSITION_ENTER ? GeofencingRequest
+								.INITIAL_TRIGGER_ENTER : GeofencingRequest.INITIAL_TRIGGER_EXIT);
 				builder.addGeofences(mGeofenceListsToAdd);
-				LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, builder.build(), getPendingIntent())
+				GeofencingRequest build = builder.build();
+				LocationServices.GeofencingApi
+						.addGeofences(mGoogleApiClient, build, getPendingIntent())
 						.setResultCallback(new ResultCallback<Status>() {
 							@Override
 							public void onResult(@NonNull Status status) {
@@ -98,7 +99,8 @@ public class GeofencingService extends Service implements
 
 	private PendingIntent getPendingIntent() {
 		Intent transitionService = new Intent(this, ReceiveTransitionsIntentService.class);
-		return PendingIntent.getService(this, 0, transitionService, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent
+				.getService(this, 0, transitionService, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	@Override
@@ -125,10 +127,11 @@ public class GeofencingService extends Service implements
 		} else {
 			String text = "Error while geofence: " + status.getStatusMessage();
 			Log.e("GEO", text);
-			Toast.makeText(GeofencingService.this, text, Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(GeofencingService.this, text, Toast.LENGTH_SHORT).show();
 		}
 
 	}
+
+	public enum Action implements Serializable {ADD, REMOVE}
 
 }
