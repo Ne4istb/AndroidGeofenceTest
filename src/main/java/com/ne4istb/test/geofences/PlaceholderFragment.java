@@ -32,36 +32,48 @@ public class PlaceholderFragment extends Fragment {
         mLongitudeView = (EditText) rootView.findViewById(R.id.edit_longitude);
         mRadiusView = (EditText) rootView.findViewById(R.id.edit_radius);
 
-        Button button = (Button) rootView.findViewById(R.id.set_geofence);
-        InitButtonCallbacks(button);
+        if (BuildConfig.DEBUG) {
+            mLatitudeView.setText("48.01478856");
+            mLongitudeView.setText("37.80279636");
+            mRadiusView.setText("150");
+        }
+
+        Button enterButton = (Button) rootView.findViewById(R.id.set_geofence_enter);
+        Button exitButton = (Button) rootView.findViewById(R.id.set_geofence_exit);
+
+        enterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendGeo(Geofence.GEOFENCE_TRANSITION_ENTER);
+            }
+        });
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendGeo(Geofence.GEOFENCE_TRANSITION_EXIT);
+            }
+        });
 
         return rootView;
     }
 
-    private void InitButtonCallbacks(Button button) {
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                FragmentActivity activity = getActivity();
+    private void sendGeo(int transitionType) {FragmentActivity activity = getActivity();
 
-                double latitude = Double.parseDouble(mLatitudeView.getText().toString());
-                double longitude = Double.parseDouble(mLongitudeView.getText().toString());
-                float radius = Float.parseFloat(mRadiusView.getText().toString());
+        double latitude = Double.parseDouble(mLatitudeView.getText().toString());
+        double longitude = Double.parseDouble(mLongitudeView.getText().toString());
+        float radius = Float.parseFloat(mRadiusView.getText().toString());
 
-                int transitionType = Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT;
 
-                MyGeofence myGeofence = new MyGeofence(mId, latitude, longitude, radius, transitionType);
+        MyGeofence myGeofence = new MyGeofence(mId, latitude, longitude, radius, transitionType);
 
-                Intent geofencingService = new Intent(activity, GeofencingService.class);
+        Intent geofencingService = new Intent(activity, GeofencingService.class);
+        geofencingService.setAction(String.valueOf(Math.random()));
+        geofencingService.putExtra(GeofencingService.EXTRA_ACTION, GeofencingService.Action.ADD);
+        geofencingService.putExtra(GeofencingService.EXTRA_GEOFENCE, myGeofence);
 
-                geofencingService.putExtra(GeofencingService.EXTRA_ACTION, GeofencingService.Action.ADD);
-                geofencingService.putExtra(GeofencingService.EXTRA_GEOFENCE, myGeofence);
+        activity.startService(geofencingService);
 
-                activity.startService(geofencingService);
-
-                mId++;
-            }
-        });
+        mId++;
     }
 }

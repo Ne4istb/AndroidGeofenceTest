@@ -5,7 +5,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.ne4istb.test.com.ne4istb.test.geofences.MainActivity$PlaceholderFragment">
+    tools:context="com.ne4istb.test.geofences.MainActivity">
     <FrameLayout android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,12 +14,22 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_set_geofence"
-        android:id="@+id/set_geofence"
+        android:id="@+id/set_geofence_enter"
         android:layout_gravity="top"
         android:layout_marginTop="150dp"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_set_geofence_"
+            android:id="@+id/set_geofence_exit"
+            android:layout_gravity="top"
+            android:layout_marginTop="200dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -53,7 +63,7 @@
         android:ems="10"
         android:id="@+id/edit_radius"
         android:layout_gravity="top|right"
-        android:layout_above="@+id/set_geofence"
+        android:layout_above="@+id/set_geofence_enter"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="100dp" />

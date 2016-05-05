@@ -3,5 +3,6 @@
 
     <string name="app_name">Test Geofence</string>
     <string name="button_set_geofence">Set geofence</string>
+    <string name="button_set_geofence_">Set geofence for exit</string>
 
 </resources>

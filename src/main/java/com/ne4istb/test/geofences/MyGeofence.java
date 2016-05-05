@@ -30,4 +30,8 @@ public class MyGeofence implements Serializable {
                 .setExpirationDuration(ONE_MINUTE)
                 .build();
     }
+
+    public int getTransitionType() {
+        return transitionType;
+    }
 }
