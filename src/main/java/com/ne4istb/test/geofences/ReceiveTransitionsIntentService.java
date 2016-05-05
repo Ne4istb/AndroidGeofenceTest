@@ -10,7 +10,6 @@ import android.util.Log;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReceiveTransitionsIntentService extends IntentService {
@@ -74,13 +73,5 @@ public class ReceiveTransitionsIntentService extends IntentService {
 		}
 	}
 
-	private void removeGeofences(List<String> requestIds) {
-		Intent intent = new Intent(getApplicationContext(), GeofencingService.class);
 
-		String[] ids = new String[0];
-		intent.putExtra(GeofencingService.EXTRA_REQUEST_IDS, requestIds.toArray(ids));
-		intent.putExtra(GeofencingService.EXTRA_ACTION, GeofencingService.Action.REMOVE);
-
-		startService(intent);
-	}
 }

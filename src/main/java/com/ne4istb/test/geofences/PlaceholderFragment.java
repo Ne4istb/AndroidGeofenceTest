@@ -38,16 +38,16 @@ public class PlaceholderFragment extends Fragment {
             mRadiusView.setText("150");
         }
 
-        Button button = (Button) rootView.findViewById(R.id.set_geofence);
-        Button button2 = (Button) rootView.findViewById(R.id.set_geofence_2);
+        Button enterButton = (Button) rootView.findViewById(R.id.set_geofence_enter);
+        Button exitButton = (Button) rootView.findViewById(R.id.set_geofence_exit);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        enterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendGeo(Geofence.GEOFENCE_TRANSITION_ENTER);
             }
         });
-        button2.setOnClickListener(new View.OnClickListener() {
+        exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendGeo(Geofence.GEOFENCE_TRANSITION_EXIT);

@@ -40,18 +40,11 @@ public class GeofencingService extends Service implements GoogleApiClient.Connec
 
 		mAction = (Action) intent.getSerializableExtra(EXTRA_ACTION);
 
-		switch (mAction) {
-			case ADD:
-				MyGeofence newGeofence = (MyGeofence) intent.getSerializableExtra(EXTRA_GEOFENCE);
-				transitionType = newGeofence.getTransitionType();
-				mGeofenceListsToAdd.add(newGeofence.toGeofence());
-				break;
-			case REMOVE:
-				//                mGeofenceListsToRemove = Arrays.asList(intent
-				// .getStringArrayExtra(EXTRA_REQUEST_IDS));
-				break;
+		if (mAction == Action.ADD) {
+			MyGeofence newGeofence = (MyGeofence) intent.getSerializableExtra(EXTRA_GEOFENCE);
+			transitionType = newGeofence.getTransitionType();
+			mGeofenceListsToAdd.add(newGeofence.toGeofence());
 		}
-
 
 		mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
 				.addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
@@ -63,32 +56,29 @@ public class GeofencingService extends Service implements GoogleApiClient.Connec
 	@Override
 	public void onConnected(Bundle bundle) {
 		Log.d("GEO", "Location client connected");
-		switch (mAction) {
-			case ADD:
-				GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-				Log.d("GEO", "Location client adds geofence");
-				builder.setInitialTrigger(
-						transitionType == Geofence.GEOFENCE_TRANSITION_ENTER ? GeofencingRequest
-								.INITIAL_TRIGGER_ENTER : GeofencingRequest.INITIAL_TRIGGER_EXIT);
-				builder.addGeofences(mGeofenceListsToAdd);
-				GeofencingRequest build = builder.build();
-				LocationServices.GeofencingApi
-						.addGeofences(mGoogleApiClient, build, getPendingIntent())
-						.setResultCallback(new ResultCallback<Status>() {
-							@Override
-							public void onResult(@NonNull Status status) {
-								if (status.isSuccess()) {
-									String msg = "Geofences added: " + status.getStatusMessage();
-									Log.e("GEO", msg);
-									Toast.makeText(GeofencingService.this, msg, Toast.LENGTH_SHORT)
-											.show();
-								}
-								GeofencingService.this.onResult(status);
+		if (mAction == Action.ADD) {
+			GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+			Log.d("GEO", "Location client adds geofence");
+			builder.setInitialTrigger(
+					transitionType == Geofence.GEOFENCE_TRANSITION_ENTER ? GeofencingRequest
+							.INITIAL_TRIGGER_ENTER : GeofencingRequest.INITIAL_TRIGGER_EXIT);
+			builder.addGeofences(mGeofenceListsToAdd);
+			GeofencingRequest build = builder.build();
+			LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, build,
+					getPendingIntent())
+					.setResultCallback(new ResultCallback<Status>() {
+						@Override
+						public void onResult(@NonNull Status status) {
+							if (status.isSuccess()) {
+								String msg = "Geofences added: " + status.getStatusMessage();
+								Log.e("GEO", msg);
+								Toast.makeText(GeofencingService.this, msg, Toast.LENGTH_SHORT)
+										.show();
 							}
-						});
-				break;
-			case REMOVE:
-				break;
+							GeofencingService.this.onResult(status);
+						}
+					});
+
 		}
 	}
 
